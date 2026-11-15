@@ -1,4 +1,4 @@
-"""A geometric HerdR stand-in: splits and swaps move real rectangles."""
+"""A geometric Herdr stand-in: splits and swaps move real rectangles."""
 import copy
 
 

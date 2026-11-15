@@ -38,28 +38,28 @@ class HerdrClient:
                 check=False,
             )
         except subprocess.TimeoutExpired as exc:
-            raise HerdrError("HerdR command timed out") from exc
+            raise HerdrError("Herdr command timed out") from exc
         except OSError as exc:
-            raise HerdrError("could not execute HerdR: %s" % exc) from exc
+            raise HerdrError("could not execute Herdr: %s" % exc) from exc
         if completed.returncode != 0:
             detail = (completed.stderr or completed.stdout or "unknown error").strip()
-            raise HerdrError("HerdR command failed: %s" % detail)
+            raise HerdrError("Herdr command failed: %s" % detail)
         try:
             payload = json.loads(completed.stdout)
         except (TypeError, json.JSONDecodeError) as exc:
-            raise HerdrError("HerdR returned invalid JSON") from exc
+            raise HerdrError("Herdr returned invalid JSON") from exc
         if not isinstance(payload, dict):
-            raise HerdrError("HerdR response root is not an object")
+            raise HerdrError("Herdr response root is not an object")
         return payload
 
     @staticmethod
     def _result(payload: Mapping[str, Any], key: str) -> Mapping[str, Any]:
         result = payload.get("result")
         if not isinstance(result, dict):
-            raise HerdrError("HerdR response is missing result")
+            raise HerdrError("Herdr response is missing result")
         value = result.get(key)
         if not isinstance(value, dict):
-            raise HerdrError("HerdR response is missing %s" % key)
+            raise HerdrError("Herdr response is missing %s" % key)
         return value
 
     @classmethod
@@ -67,17 +67,17 @@ class HerdrClient:
         result = cls._result(payload, "move_result")
         if result.get("changed") is not True:
             reason = result.get("reason", "operation was refused")
-            raise HerdrError("HerdR refused pane move: %s" % reason)
+            raise HerdrError("Herdr refused pane move: %s" % reason)
         pane = result.get("pane")
         if not isinstance(pane, dict):
-            raise HerdrError("HerdR move_result is missing pane")
+            raise HerdrError("Herdr move_result is missing pane")
         pane_id = pane.get("pane_id")
         tab_id = pane.get("tab_id")
         if not isinstance(pane_id, str) or not isinstance(tab_id, str):
-            raise HerdrError("HerdR move_result contains invalid pane identity")
+            raise HerdrError("Herdr move_result contains invalid pane identity")
         closed_tab_id = result.get("closed_tab_id")
         if closed_tab_id is not None and not isinstance(closed_tab_id, str):
-            raise HerdrError("HerdR move_result contains invalid closed tab ID")
+            raise HerdrError("Herdr move_result contains invalid closed tab ID")
         return MoveResult(True, pane_id, tab_id, closed_tab_id)
 
     def pane_labels(self, tab_id: str) -> Dict[str, str]:
@@ -129,14 +129,14 @@ class HerdrClient:
         pane = self._result(payload, "pane")
         pane_id = pane.get("pane_id")
         if not isinstance(pane_id, str):
-            raise HerdrError("HerdR split response contains invalid pane identity")
+            raise HerdrError("Herdr split response contains invalid pane identity")
         return pane_id
 
     def detach(self, pane_id: str) -> MoveResult:
         payload = self._run(("pane", "move", pane_id, "--new-tab", "--no-focus"))
         result = self._move_result(payload)
         if result.pane_id != pane_id:
-            raise HerdrError("HerdR changed pane ID while detaching %s" % pane_id)
+            raise HerdrError("Herdr changed pane ID while detaching %s" % pane_id)
         return result
 
     def insert(
@@ -165,7 +165,7 @@ class HerdrClient:
         )
         result = self._move_result(payload)
         if result.pane_id != pane_id or result.tab_id != tab_id:
-            raise HerdrError("HerdR inserted pane into an unexpected destination")
+            raise HerdrError("Herdr inserted pane into an unexpected destination")
         return result
 
     def swap(self, source_pane_id: str, target_pane_id: str) -> None:
@@ -182,7 +182,7 @@ class HerdrClient:
         result = self._result(payload, "swap")
         if result.get("changed") is not True:
             reason = result.get("reason", "operation was refused")
-            raise HerdrError("HerdR refused pane swap: %s" % reason)
+            raise HerdrError("Herdr refused pane swap: %s" % reason)
 
     def unzoom(self, pane_id: str) -> None:
         self._run(("pane", "zoom", pane_id, "--off"))

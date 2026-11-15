@@ -13,7 +13,7 @@ def split(direction, ratio, first, second):
     return {"type": "split", "direction": direction, "ratio": ratio, "first": first, "second": second}
 
 
-# The shape HerdR builds when you split a pane right and then split the new one down.
+# The shape Herdr builds when you split a pane right and then split the new one down.
 MAIN_LEFT_TREE = split("right", 0.5, pane("a"), split("down", 0.5, pane("b"), pane("c")))
 # Three columns built by splitting the first pane twice: right(right(a, b), c).
 LEFT_NESTED_COLUMNS = split("right", 0.66, split("right", 0.5, pane("a"), pane("b")), pane("c"))

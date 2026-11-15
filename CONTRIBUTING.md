@@ -20,3 +20,5 @@ CI runs the tests on Ubuntu and macOS with Python 3.9 and 3.13, and validates `h
 - Keep the manifest valid: required fields present, and action and pane ids unique.
 - `tests/live_acceptance.py` rearranges real panes. Run it only against a throwaway session (`herdr --session <scratch>`), never your working one.
 - Do not commit personal paths, names or session data.
+
+Write `herdr` for the command and Herdr for the product; never HerdR.

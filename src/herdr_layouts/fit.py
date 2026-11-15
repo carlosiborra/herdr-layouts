@@ -1,13 +1,13 @@
 """Fit a tab's existing split tree to a target layout by changing ratios only.
 
-HerdR exports a tab as a binary split tree. Many trees can draw the same
+Herdr exports a tab as a binary split tree. Many trees can draw the same
 picture: three columns may be right(a, right(b, c)) or right(right(a, b), c).
 Instead of moving panes to rebuild the preset's exact tree, this module asks
 whether the tree the tab already has can reach the target rectangles, and if
 so with which ratios. Adjusting ratios never moves, closes or restarts a pane,
 and can be animated.
 
-Paths follow HerdR's layout.set_split_ratio: a list of booleans from the root,
+Paths follow Herdr's layout.set_split_ratio: a list of booleans from the root,
 False for the first child and True for the second.
 """
 import time
@@ -18,7 +18,7 @@ from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 Rect = Tuple[float, float, float, float]
 Path = Tuple[bool, ...]
 
-# HerdR clamps split ratios to this range.
+# Herdr clamps split ratios to this range.
 MIN_RATIO, MAX_RATIO = 0.1, 0.9
 TOLERANCE = 0.004
 

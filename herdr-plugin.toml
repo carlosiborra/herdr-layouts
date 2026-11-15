@@ -1,8 +1,8 @@
 id = "carlosiborra.layouts"
-name = "HerdR Layouts"
-version = "0.4.1"
+name = "Herdr Layouts"
+version = "0.4.2"
 min_herdr_version = "0.9.5"
-description = "Visual, recoverable pane layouts with favorites and saved layouts for HerdR"
+description = "Visual, recoverable pane layouts with favorites and saved layouts for Herdr"
 platforms = ["linux", "macos"]
 
 [[actions]]

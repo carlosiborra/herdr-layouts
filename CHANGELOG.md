@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.2
+
+- Naming: the product is spelled Herdr everywhere (never HerdR); the manifest name is now "Herdr Layouts". Vendored helpers: HerdR → Herdr spelling only.
+- README rewritten: tagline, install and keybinding up front, demo, project page link, suite links; the text render moved into a collapsed section.
+- README claims now match the code: ratio easing when the split tree already matches, otherwise panes are moved, never closed or restarted.
+- README fixed the fallback config directory to `carlosiborra.layouts`.
+
 ## 0.4.1
 
 - Fixed the picker popup exiting immediately: popup panes receive the focused pane only in `HERDR_PLUGIN_CONTEXT_JSON`, which is now used when `HERDR_ACTIVE_PANE_ID` and `HERDR_PANE_ID` are absent.

@@ -97,7 +97,7 @@ class LayoutTransaction:
                 )
                 if result.closed_tab_id is None:
                     raise TransactionError(
-                        "HerdR did not confirm closure of the staging tab for %s"
+                        "Herdr did not confirm closure of the staging tab for %s"
                         % operation.pane_id
                     )
                 staged.remove(operation.pane_id)

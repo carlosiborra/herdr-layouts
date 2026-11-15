@@ -377,7 +377,7 @@ class LayoutApp:
                 self.client.split(self.active_pane_id, direction="right", ratio=0.5)
             snapshot = snapshot_from_payload(self.client.layout(self.active_pane_id), self.active_pane_id)
             if len(snapshot.panes) != preset.pane_count:
-                raise AppError("HerdR did not create the expected panes")
+                raise AppError("Herdr did not create the expected panes")
             self.transaction.apply(snapshot, preset)
             self._queue_bloom()
         self.log.write("applied %s from=%d via=%s ms=%d" % (
@@ -554,9 +554,9 @@ class LayoutApp:
 
 
 def _config_root(environ: Mapping[str, str]) -> Path:
-    """Saved layouts and favorites live here: HERDR_PLUGIN_CONFIG_DIR when HerdR provides it.
+    """Saved layouts and favorites live here: HERDR_PLUGIN_CONFIG_DIR when Herdr provides it.
 
-    The home-relative fallback only applies when the plugin runs outside HerdR (for example from a shell).
+    The home-relative fallback only applies when the plugin runs outside Herdr (for example from a shell).
     """
     configured = environ.get("HERDR_PLUGIN_CONFIG_DIR")
     if configured:
@@ -574,7 +574,7 @@ def _herdr_config_path(environ: Mapping[str, str]) -> Path:
 
 
 def open_argv(environ: Mapping[str, str]) -> list:
-    """The argv that asks HerdR to open the picker as this plugin's popup pane."""
+    """The argv that asks Herdr to open the picker as this plugin's popup pane."""
     return [
         environ.get("HERDR_BIN_PATH") or "herdr", "plugin", "pane", "open",
         "--plugin", environ.get("HERDR_PLUGIN_ID") or "carlosiborra.layouts",
@@ -587,10 +587,10 @@ def open_picker(environ: Mapping[str, str]) -> int:
         result = subprocess.run(open_argv(environ), env=dict(environ), capture_output=True, text=True,
                                 timeout=10, check=False)
     except (OSError, subprocess.SubprocessError) as exc:
-        print("HerdR Layouts could not open its picker: %s" % exc, file=sys.stderr)
+        print("Herdr Layouts could not open its picker: %s" % exc, file=sys.stderr)
         return 1
     if result.returncode != 0:
-        print("HerdR Layouts could not open its picker: %s" % (result.stderr.strip() or result.returncode),
+        print("Herdr Layouts could not open its picker: %s" % (result.stderr.strip() or result.returncode),
               file=sys.stderr)
         return 1
     return 0
@@ -723,7 +723,7 @@ def main(argv=None, environ: Optional[Mapping[str, str]] = None) -> int:
         print("herdr-layouts %s" % __version__)
         return 0
     if sys.version_info < (3, 9):
-        print("HerdR Layouts requires Python 3.9 or newer", file=sys.stderr)
+        print("Herdr Layouts requires Python 3.9 or newer", file=sys.stderr)
         return 2
     if args[:1] == ["--open"]:
         return open_picker(env)
@@ -733,11 +733,11 @@ def main(argv=None, environ: Optional[Mapping[str, str]] = None) -> int:
         rpc = connect(env)
         return play_main(args[1], rpc, StateStore(root)) if rpc is not None else 1
     if env.get("HERDR_ENV") != "1":
-        print("HerdR Layouts must run inside a HerdR pane", file=sys.stderr)
+        print("Herdr Layouts must run inside a Herdr pane", file=sys.stderr)
         return 2
     active_pane_id = env.get("HERDR_ACTIVE_PANE_ID") or env.get("HERDR_PANE_ID") or _context_pane_id(env)
     if not active_pane_id:
-        print("HerdR did not provide an active pane ID", file=sys.stderr)
+        print("Herdr did not provide an active pane ID", file=sys.stderr)
         return 2
     headless = next((arg for arg in args if arg in ("--auto", "--auto-ratios", "--cycle", "--balance", "--plan-auto")), None)
     if headless is not None:
@@ -757,11 +757,11 @@ def main(argv=None, environ: Optional[Mapping[str, str]] = None) -> int:
             return runner.cycle() if headless == "--cycle" else runner.balance()
         except (AppError,) + FAILURES as exc:
             log.write("headless %s failed: %s" % (headless, exc))
-            print("HerdR Layouts: %s" % exc, file=sys.stderr)
+            print("Herdr Layouts: %s" % exc, file=sys.stderr)
             return 1
     if not terminal_is_interactive(sys.stdin, sys.stdout):
         print(
-            "HerdR Layouts must run in an interactive pane; use the open action or --open",
+            "Herdr Layouts must run in an interactive pane; use the open action or --open",
             file=sys.stderr,
         )
         return 2
@@ -784,7 +784,7 @@ def main(argv=None, environ: Optional[Mapping[str, str]] = None) -> int:
         return code
     except (AppError,) + FAILURES as exc:
         log.write("fatal: %s" % exc)
-        print("HerdR Layouts: %s" % exc, file=sys.stderr)
+        print("Herdr Layouts: %s" % exc, file=sys.stderr)
         return 1
     except TerminalExit:
         return 130

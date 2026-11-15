@@ -1,9 +1,9 @@
-"""The HerdR socket API, for the two calls the CLI does not expose.
+"""The Herdr socket API, for the two calls the CLI does not expose.
 
 layout.export returns the split tree with pane IDs, and layout.set_split_ratio
 changes one split in about 5 ms. Both leave every pane and process in place,
 which is what makes ratio-only fitting and animation safe. Talking to the socket directly is
-deliberate: the HerdR CLI has no generic API-call command, so these two methods are not reachable
+deliberate: the Herdr CLI has no generic API-call command, so these two methods are not reachable
 any other way. The path comes from HERDR_SOCKET_PATH; the home-relative default is used only when
 that variable is unset. Each request uses
 its own connection because the server answers one request per connection.
@@ -43,26 +43,26 @@ class Rpc:
                         break
                     buffer += chunk
         except OSError as exc:
-            raise HerdrError("HerdR socket unavailable: %s" % exc) from exc
+            raise HerdrError("Herdr socket unavailable: %s" % exc) from exc
         try:
             payload = json.loads(buffer)
         except (TypeError, ValueError) as exc:
-            raise HerdrError("HerdR socket returned invalid JSON") from exc
+            raise HerdrError("Herdr socket returned invalid JSON") from exc
         if not isinstance(payload, dict):
-            raise HerdrError("HerdR socket response is not an object")
+            raise HerdrError("Herdr socket response is not an object")
         error = payload.get("error")
         if isinstance(error, dict):
-            raise HerdrError("HerdR %s failed: %s" % (method, error.get("message", "unknown error")))
+            raise HerdrError("Herdr %s failed: %s" % (method, error.get("message", "unknown error")))
         result = payload.get("result")
         if not isinstance(result, dict):
-            raise HerdrError("HerdR %s returned no result" % method)
+            raise HerdrError("Herdr %s returned no result" % method)
         return result
 
     def export(self, tab_id: str) -> Mapping[str, Any]:
         """The tab's layout: workspace_id, tab_id, zoomed, focused_pane_id and the split tree root."""
         layout = self.call("layout.export", {"tab_id": tab_id}).get("layout")
         if not isinstance(layout, dict) or not isinstance(layout.get("root"), dict):
-            raise HerdrError("HerdR layout export is malformed")
+            raise HerdrError("Herdr layout export is malformed")
         return layout
 
     def set_ratio(self, tab_id: str, path: Sequence[bool], ratio: float) -> None:

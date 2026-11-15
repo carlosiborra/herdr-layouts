@@ -20,7 +20,7 @@ from .planner import expected_rectangles
 from .rpc import Rpc
 from .state import StateStore
 
-# Long enough for HerdR to close the popup before the first frame.
+# Long enough for Herdr to close the popup before the first frame.
 POPUP_CLOSE_DELAY = 0.08
 EASING = "out-cubic"
 

@@ -1,15 +1,62 @@
-# HerdR Layouts
+# herdr-layouts
 
 [![CI](https://github.com/carlosiborra/herdr-layouts/actions/workflows/ci.yml/badge.svg)](https://github.com/carlosiborra/herdr-layouts/actions/workflows/ci.yml)
 [![Latest release](https://img.shields.io/github/v/release/carlosiborra/herdr-layouts)](https://github.com/carlosiborra/herdr-layouts/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![HerdR plugin](https://img.shields.io/badge/HerdR-plugin-8A63D2)](https://herdr.dev/tui/plugins/)
+[![Herdr plugin](https://img.shields.io/badge/Herdr-plugin-8A63D2)](https://herdr.dev/tui/plugins/)
 
-Visual, recoverable pane layouts for [HerdR](https://herdr.dev), the terminal workspace manager.
+Rearrange Herdr panes into any of 32 layouts without restarting a process, and roll back if anything fails.
 
-Pick a layout from a picker, press a key, and your panes rearrange without restarting anything.
+- See a diagram preview of every layout before you apply it.
+- Keep favorites and saved layouts on number keys.
+- Every change is verified and recoverable.
+
+```sh
+herdr plugin install carlosiborra/herdr-layouts
+```
+
+```toml
+[[keys.command]]
+key = "prefix+shift+space"
+type = "plugin_action"
+command = "carlosiborra.layouts.open"
+```
 
 ![Demo: opening the layout picker and applying a layout](docs/demo.gif)
+
+*Open the picker, press a key, and your panes rearrange.*
+
+Project page: <https://carlosiborra.github.io/herdr-layouts/>
+
+## What it does
+
+A plain layout apply gives you no preview, no way back and no memory. Herdr Layouts shows every layout as a diagram, builds it from the panes you already have, verifies the result and rolls back to the previous arrangement if anything fails. It also remembers favorites and saved layouts. It eases split ratios when the tab's split tree already matches the target; otherwise it moves panes between tabs and back, and never closes or restarts them.
+
+Herdr Layouts arranges one to six panes into 32 built-in layouts, your own saved layouts, and layouts you write by hand, without closing existing panes. From a single pane it splits straight into the chosen layout; with two to four panes it rearranges them in place. Favorites open first and apply with one key. The picker follows your Herdr theme, labels the panes you already have, and marks the layout the tab already uses.
+
+## Requirements
+
+- Herdr 0.9.5 or newer (the tested version; uses `layout.export` and `layout.set_split_ratio`)
+- Python 3.9 or newer
+- macOS or Linux
+
+The plugin uses only Python's standard library. It performs no downloads, network access, browser access, credential access, project scanning, agent control, or pane-input injection.
+
+## Installation
+
+Install with the command above. The plugin provides a popup pane (`picker`) and an `open` action that opens it. Bind the action in `~/.config/herdr/config.toml`:
+
+```toml
+[[keys.command]]
+key = "prefix+shift+space"
+type = "plugin_action"
+command = "carlosiborra.layouts.open"
+description = "choose a pane layout"
+```
+
+Then run `herdr config check` and `herdr server reload-config`. `python3 bin/herdr-layouts --version` inside the plugin directory prints the installed version.
+
+<details><summary>Text preview</summary>
 
 ```text
   Layouts                                                             2 panes   3 panes   4 panes
@@ -26,37 +73,7 @@ Pick a layout from a picker, press a key, and your panes rearrange without resta
 
 *Abridged synthetic render of the picker (plain palette). The real picker is themed and fills the popup.*
 
-## What it improves on raw `layout.apply`
-
-A plain layout apply gives you no preview, no way back and no memory. HerdR Layouts shows every layout as a diagram, builds it from the panes you already have, verifies the result, and rolls back to the previous arrangement if anything fails. It also remembers favorites and saved layouts, and reaches layouts by easing split ratios when it can, so running processes are never moved.
-
-HerdR Layouts arranges one to six panes into 32 built-in layouts, your own saved layouts, and layouts you write by hand, without closing existing pane processes. From a single pane it splits straight into the chosen layout; with two to four panes it rearranges them in place. Favorites open first and apply with one key. The picker follows your HerdR theme, labels the panes you already have, and marks the layout the tab already uses.
-
-## Requirements
-
-- HerdR 0.9.5 or newer (the tested version; uses `layout.export` and `layout.set_split_ratio`)
-- Python 3.9 or newer
-- macOS or Linux
-
-The plugin uses only Python's standard library. It performs no downloads, network access, browser access, credential access, project scanning, agent control, or pane-input injection.
-
-## Installation
-
-```sh
-herdr plugin install carlosiborra/herdr-layouts
-```
-
-The plugin provides a popup pane (`picker`) and an `open` action that opens it. Bind the action in `~/.config/herdr/config.toml`:
-
-```toml
-[[keys.command]]
-key = "prefix+shift+space"
-type = "plugin_action"
-command = "carlosiborra.layouts.open"
-description = "choose a pane layout"
-```
-
-Then run `herdr config check` and `herdr server reload-config`. `python3 bin/herdr-layouts --version` inside the plugin directory prints the installed version.
+</details>
 
 ## Keys
 
@@ -80,7 +97,7 @@ When an earlier change was interrupted, the picker asks first: `r` restores the 
 - **Saving.** Arrange a tab of two to four panes the way you like (including dragged ratios), open the picker there, and press `s`. Saving a shape that already exists asks first. Saved layouts keep your pane as the anchor.
 - **Saved group.** Shows saved layouts of every pane count, tagged `2p`, `3p` or `4p`. Each applies like a built-in: from one pane it builds directly, with fewer panes it adds them, and with more panes it explains instead of closing anything.
 
-Both live in `library.json` in the plugin config directory (HerdR sets `HERDR_PLUGIN_CONFIG_DIR` for the plugin; when the plugin runs outside HerdR it falls back to `~/.config/herdr/plugins/config/herdr-layouts`).
+Both live in `library.json` in the plugin config directory (Herdr sets `HERDR_PLUGIN_CONFIG_DIR` for the plugin; when the plugin runs outside Herdr it falls back to `~/.config/herdr/plugins/config/herdr-layouts`).
 
 ### Hand-written layouts
 
@@ -114,17 +131,17 @@ Headless commands for key bindings (`bin/herdr-layouts <flag>` inside a pane):
 | `--balance` | Give every pane an equal share |
 | `--plan-auto` | Print how the auto layout would be reached; changes nothing |
 
-Layouts are reached by **easing split ratios** whenever the tab's existing split tree can draw the target, which moves and restarts nothing. Only when panes would have to change places does the move engine run. After the popup closes, the change is eased over `animation_ms` (default 220, `0` turns it off, set in `library.json`).
+Layouts are reached by **easing split ratios** whenever the tab's existing split tree can draw the target, which moves nothing. Only when panes would have to change places does the move engine run. After the popup closes, the change is eased over `animation_ms` (default 220, `0` turns it off, set in `library.json`).
 
 ## Theme
 
-Colors come from your HerdR `config.toml` (`$HERDR_CONFIG_PATH`, else `$XDG_CONFIG_HOME/herdr/config.toml`, else `~/.config/herdr/config.toml`): the built-in palette named in `[theme]` (or `dark_name` / `light_name` with `auto_switch`), then `[theme.custom]` and the matching `[theme.custom.dark]` or `[theme.custom.light]` overrides. Your pane uses `accent`, new panes `yellow`, existing panes `surface0` and `surface1`, and borders blend `overlay0` into the background. With `panel_bg = "reset"` the picker blends against `surface_dim`, which should be close to your terminal background.
+Colors come from your Herdr `config.toml` (`$HERDR_CONFIG_PATH`, else `$XDG_CONFIG_HOME/herdr/config.toml`, else `~/.config/herdr/config.toml`): the built-in palette named in `[theme]` (or `dark_name` / `light_name` with `auto_switch`), then `[theme.custom]` and the matching `[theme.custom.dark]` or `[theme.custom.light]` overrides. Your pane uses `accent`, new panes `yellow`, existing panes `surface0` and `surface1`, and borders blend `overlay0` into the background. With `panel_bg = "reset"` the picker blends against `surface_dim`, which should be close to your terminal background.
 
 `NO_COLOR` is respected; the selected layout keeps a heavy border so selection never relies on color alone. Set `HERDR_LAYOUTS_APPEARANCE=light` or `dark` to override appearance detection.
 
 ## Behavior
 
-- **One pane.** Applying a layout splits your pane directly into it; `● you` marks your pane and `+ new` the new ones. If HerdR fails partway, the new panes are closed.
+- **One pane.** Applying a layout splits your pane directly into it; `● you` marks your pane and `+ new` the new ones. If Herdr fails partway, the new panes are closed.
 - **Two to four panes.** The matching group (or Favorites) opens with the current layout selected and labelled `current`; applying it again does nothing. Existing panes are labelled with their agent or shell and folder. A layout with more panes creates them first.
 - **Fewer panes than the tab has.** The group shows as a preview and explains what to close; nothing is closed for you.
 - **Zoomed pane.** Unzoomed before applying.
@@ -133,7 +150,7 @@ Colors come from your HerdR `config.toml` (`$HERDR_CONFIG_PATH`, else `$XDG_CONF
 
 ## Safety and recovery
 
-HerdR refuses direct same-tab moves. The plugin snapshots the source topology, stages non-anchor panes in temporary tabs, reconstructs the selected split tree, verifies the result, and removes its recovery journal only after success.
+Herdr refuses direct same-tab moves. The plugin snapshots the source topology, stages non-anchor panes in temporary tabs, reconstructs the selected split tree, verifies the result, and removes its recovery journal only after success.
 
 If an operation fails, the plugin reconstructs and verifies the source layout. If recovery cannot be verified, it keeps the journal and blocks new changes until recovery is retried.
 
@@ -143,13 +160,13 @@ Stored state is preset IDs, auto choices and the pattern name, saved layout name
 
 Run with `HERDR_LAYOUTS_DEBUG=1` to append timings, theme resolution and errors to `debug.log` in the plugin config directory. It records layout IDs and counts only, never pane content. Lock files for old tabs are removed after a day.
 
-## Why the plugin uses the HerdR socket
+## Why the plugin uses the Herdr socket
 
-The HerdR CLI has no generic API-call command. Two operations the plugin needs, `layout.export` (the split tree with pane IDs) and `layout.set_split_ratio` (change one split without touching any pane), are only reachable through the local Unix socket. The plugin connects to `HERDR_SOCKET_PATH`; `~/.config/herdr/herdr.sock` is used only when that variable is unset. Everything else goes through `$HERDR_BIN_PATH`.
+The Herdr CLI has no generic API-call command. Two operations the plugin needs, `layout.export` (the split tree with pane IDs) and `layout.set_split_ratio` (change one split without touching any pane), are only reachable through the local Unix socket. The plugin connects to `HERDR_SOCKET_PATH`; `~/.config/herdr/herdr.sock` is used only when that variable is unset. Everything else goes through `$HERDR_BIN_PATH`.
 
 ## Privacy and trust
 
-The plugin reads the pane layout (pane IDs, geometry, and for display labels the agent or shell name and folder) and moves or resizes panes. It never reads pane contents, injects input, or touches the network. It is not sandboxed: it runs as you, like any HerdR plugin, so review the source before installing. See [SECURITY.md](SECURITY.md).
+The plugin reads the pane layout (pane IDs, geometry, and for display labels the agent or shell name and folder) and moves or resizes panes. It never reads pane contents, injects input, or touches the network. It is not sandboxed: it runs as you, like any Herdr plugin, so review the source before installing. See [SECURITY.md](SECURITY.md).
 
 ## Development and tests
 
@@ -158,7 +175,7 @@ python3 -m unittest discover -s tests -t .
 python3 -m compileall -q src bin
 ```
 
-`tests/live_acceptance.py` drives a real HerdR server and **rearranges and creates panes**. Run it only against a throwaway session, never your working one:
+`tests/live_acceptance.py` drives a real Herdr server and **rearranges and creates panes**. Run it only against a throwaway session, never your working one:
 
 ```sh
 herdr --session scratch   # in another terminal
@@ -171,6 +188,15 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Update with `herdr plugin update carlosiborra.layouts` (or reinstall). To uninstall, remove the keybinding and run `herdr plugin uninstall carlosiborra.layouts`. Delete the plugin config directory too if you no longer want saved layouts and favorites.
 
+## More from this suite
+
+- [herdr-find](https://github.com/carlosiborra/herdr-find): fuzzy-find any terminal or agent
+- [herdr-fleet](https://github.com/carlosiborra/herdr-fleet): agent triage dashboard
+- [herdr-layouts](https://github.com/carlosiborra/herdr-layouts): visual, recoverable pane layouts
+- [herdr-motion](https://github.com/carlosiborra/herdr-motion): smooth split-ratio effects
+
 ## License
 
 MIT, see [LICENSE](LICENSE).
+
+An independent community plugin for [Herdr](https://herdr.dev); not affiliated with the Herdr project.
