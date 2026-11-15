@@ -2,6 +2,8 @@
 
 ## 0.4.0
 
+- Plugin id is now `carlosiborra.layouts` (namespaced, so it cannot clash with other `herdr-layouts` plugins). Bind actions as `carlosiborra.layouts.<action>`.
+
 - Standalone, installable release: `herdr plugin install carlosiborra/herdr-layouts`.
 - Added a `picker` popup pane (72% x 80%); the `open` action now opens it, so a `plugin_action` key binding works without an absolute path.
 - `min_herdr_version` is now 0.9.5, the tested version.

@@ -270,7 +270,7 @@ class OpenArgvTests(unittest.TestCase):
         from herdr_layouts.app import open_argv
         argv = open_argv({})
         self.assertEqual(argv[0], "herdr")
-        self.assertEqual(argv[argv.index("--plugin") + 1], "herdr-layouts")
+        self.assertEqual(argv[argv.index("--plugin") + 1], "carlosiborra.layouts")
         self.assertEqual(argv[argv.index("--entrypoint") + 1], "picker")
 
     def test_open_flag_runs_argv_without_needing_a_pane(self):

@@ -45,7 +45,7 @@ The plugin provides a popup pane (`picker`) and an `open` action that opens it. 
 [[keys.command]]
 key = "prefix+shift+space"
 type = "plugin_action"
-command = "herdr-layouts.open"
+command = "carlosiborra.layouts.open"
 description = "choose a pane layout"
 ```
 
@@ -162,7 +162,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Update and uninstall
 
-Update with `herdr plugin update herdr-layouts` (or reinstall). To uninstall, remove the keybinding and run `herdr plugin uninstall herdr-layouts`. Delete the plugin config directory too if you no longer want saved layouts and favorites.
+Update with `herdr plugin update carlosiborra.layouts` (or reinstall). To uninstall, remove the keybinding and run `herdr plugin uninstall carlosiborra.layouts`. Delete the plugin config directory too if you no longer want saved layouts and favorites.
 
 ## License
 

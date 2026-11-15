@@ -561,7 +561,7 @@ def _config_root(environ: Mapping[str, str]) -> Path:
     configured = environ.get("HERDR_PLUGIN_CONFIG_DIR")
     if configured:
         return Path(configured)
-    return Path.home() / ".config" / "herdr" / "plugins" / "config" / "herdr-layouts"
+    return Path.home() / ".config" / "herdr" / "plugins" / "config" / "carlosiborra.layouts"
 
 
 def _herdr_config_path(environ: Mapping[str, str]) -> Path:
@@ -577,7 +577,7 @@ def open_argv(environ: Mapping[str, str]) -> list:
     """The argv that asks HerdR to open the picker as this plugin's popup pane."""
     return [
         environ.get("HERDR_BIN_PATH") or "herdr", "plugin", "pane", "open",
-        "--plugin", environ.get("HERDR_PLUGIN_ID") or "herdr-layouts",
+        "--plugin", environ.get("HERDR_PLUGIN_ID") or "carlosiborra.layouts",
         "--entrypoint", "picker", "--focus",
     ]
 
