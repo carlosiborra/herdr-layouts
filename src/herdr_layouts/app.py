@@ -707,6 +707,51 @@ class Headless:
         return "moves"
 
 
+class _NullScreen:
+    def draw(self, lines, size) -> None:
+        pass
+
+
+class NullTerminal:
+    """Stands in for the popup terminal when a layout is applied by a key binding."""
+
+    screen = _NullScreen()
+
+    def size(self) -> Tuple[int, int]:
+        return (80, 24)
+
+
+def notify(environ: Mapping[str, str], message: str) -> None:
+    """Show a Herdr notification; best effort, a missing binary never hides the exit code."""
+    argv = [environ.get("HERDR_BIN_PATH") or "herdr", "notification", "show", "Herdr Layouts", "--body", message]
+    try:
+        subprocess.run(argv, env=dict(environ), capture_output=True, text=True, timeout=10, check=False)
+    except (OSError, subprocess.SubprocessError):
+        print("Herdr Layouts: %s" % message, file=sys.stderr)
+
+
+def parse_slot(value: str) -> Optional[int]:
+    return int(value) if value.isascii() and value.isdigit() and 1 <= int(value) <= 9 else None
+
+
+def apply_favorite(slot: int, app: LayoutApp) -> Tuple[bool, str]:
+    """Apply favorite ``slot`` exactly as pressing its number key in the picker does.
+
+    Returns (ok, message). The slot order is the picker's Favorites group order.
+    """
+    if app.store.read_journal() is not None:
+        return False, "A layout change was interrupted. Open the layout picker and press r to recover."
+    app.library = app.store.load_library()
+    app._refresh()
+    favorites = app.library.favorite_presets()
+    if slot > len(favorites):
+        return False, "No favorite %d yet: open the picker and press f on a layout." % slot
+    app._say("")
+    if app._try_apply(favorites[slot - 1]):
+        return True, ""
+    return False, app.message or "Could not apply favorite %d." % slot
+
+
 def _context_pane_id(env: Mapping[str, str]) -> Optional[str]:
     """Popup panes receive the focused pane only in HERDR_PLUGIN_CONTEXT_JSON."""
     try:
@@ -727,6 +772,14 @@ def main(argv=None, environ: Optional[Mapping[str, str]] = None) -> int:
         return 2
     if args[:1] == ["--open"]:
         return open_picker(env)
+    slot = None
+    if args[:1] == ["--favorite"]:
+        slot = parse_slot(args[1]) if len(args) == 2 else None
+        if slot is None:
+            message = "Favorite slots are 1 to 9."
+            notify(env, message)
+            print("Herdr Layouts: %s" % message, file=sys.stderr)
+            return 2
     root = _config_root(env)
     entry = Path(sys.argv[0]).resolve()
     if args[:1] == ["--play"] and len(args) == 2:
@@ -739,6 +792,26 @@ def main(argv=None, environ: Optional[Mapping[str, str]] = None) -> int:
     if not active_pane_id:
         print("Herdr did not provide an active pane ID", file=sys.stderr)
         return 2
+    if slot is not None:
+        store = StateStore(root)
+        log = Log(root / "debug.log" if env.get("HERDR_LAYOUTS_DEBUG") == "1" else None)
+        client = HerdrClient(env.get("HERDR_BIN_PATH", "herdr"))
+        rpc = connect(env)
+        app = LayoutApp(client, store, LayoutTransaction(client, store), active_pane_id, NullTerminal(),
+                        Palette(), log, rpc)
+        try:
+            ok, message = apply_favorite(slot, app)
+        except (AppError,) + FAILURES as exc:
+            ok, message = False, str(exc)
+        if not ok:
+            log.write("favorite %d failed: %s" % (slot, message))
+            notify(env, message)
+            print("Herdr Layouts: %s" % message, file=sys.stderr)
+            return 1
+        if app.handoff is not None and rpc is not None:
+            tab_id, steps = app.handoff
+            hand_off(tab_id, steps, app.library.animation_ms, env, entry, rpc, delay=0.0)
+        return 0
     headless = next((arg for arg in args if arg in ("--auto", "--auto-ratios", "--cycle", "--balance", "--plan-auto")), None)
     if headless is not None:
         log = Log(root / "debug.log" if env.get("HERDR_LAYOUTS_DEBUG") == "1" else None)

@@ -306,3 +306,122 @@ class ContextPaneTests(unittest.TestCase):
         for env in ({}, {"HERDR_PLUGIN_CONTEXT_JSON": "{"}, {"HERDR_PLUGIN_CONTEXT_JSON": "[]"},
                     {"HERDR_PLUGIN_CONTEXT_JSON": '{"focused_pane_id": 3}'}):
             self.assertIsNone(_context_pane_id(env))
+
+
+class FavoriteActionTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.store = StateStore(Path(self.temp.name))
+        self.transaction = FakeTransaction()
+        library = self.store.load_library()
+        for preset_id in ("3-columns", "3-rows"):
+            library.toggle_favorite(preset_id)
+        self.store.save_library(library)
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def make(self, panes=MAIN_LEFT, **client_args):
+        from herdr_layouts.app import NullTerminal
+
+        self.client = GeometryClient(panes, **client_args)
+        return LayoutApp(self.client, self.store, self.transaction, "w1:p1", NullTerminal(), Palette("none"))
+
+    def test_slot_order_matches_picker_favorites_group(self):
+        app = self.make()
+        app.library = self.store.load_library()
+        group = next(g for g in app._groups() if g.key == "favorites")
+        self.assertEqual([p.id for p in group.presets], ["3-columns", "3-rows"])
+        from herdr_layouts.app import apply_favorite
+
+        self.assertEqual(apply_favorite(2, app), (True, ""))
+        self.assertEqual(self.transaction.applied, [(3, "3-rows")])
+
+    def test_empty_slot_changes_nothing(self):
+        from herdr_layouts.app import apply_favorite
+
+        ok, message = apply_favorite(3, self.make())
+        self.assertFalse(ok)
+        self.assertIn("No favorite 3 yet", message)
+        self.assertEqual(self.transaction.applied, [])
+        self.assertEqual([c for c in self.client.calls if c[0] in ("split", "swap", "close")], [])
+
+    def test_failure_is_reported_and_transaction_error_surfaces(self):
+        from herdr_layouts.app import apply_favorite
+        from herdr_layouts.transaction import TransactionError
+
+        self.transaction.error = TransactionError("rolled back")
+        ok, message = apply_favorite(1, self.make())
+        self.assertFalse(ok)
+        self.assertIn("rolled back", message)
+
+    def test_interrupted_state_is_refused(self):
+        from herdr_layouts.app import apply_favorite
+
+        self.store.write_journal({"schema": 1, "tab_id": "w1:t1", "completed": 2, "staged_panes": []})
+        ok, message = apply_favorite(1, self.make())
+        self.assertFalse(ok)
+        self.assertIn("press r", message)
+        self.assertEqual(self.transaction.applied, [])
+
+    def test_too_many_panes_for_layout_is_refused_without_closing(self):
+        from herdr_layouts.app import apply_favorite
+
+        panes = {"w1:p%d" % i: (0, i * 10, 120, 10) for i in range(1, 5)}
+        ok, message = apply_favorite(1, self.make(panes))
+        self.assertFalse(ok)
+        self.assertEqual([c for c in self.client.calls if c[0] == "close"], [])
+
+    def test_slot_parsing_rejects_out_of_range(self):
+        from herdr_layouts.app import parse_slot
+
+        self.assertEqual([parse_slot(v) for v in ("1", "9")], [1, 9])
+        for bad in ("0", "10", "x", "", "-1", "1.5", "٣"):
+            self.assertIsNone(parse_slot(bad))
+
+    def test_main_rejects_bad_slot_with_notification_and_no_pane_needed(self):
+        from unittest import mock
+
+        from herdr_layouts import app as app_module
+
+        for bad in ("0", "10", "abc"):
+            with mock.patch.object(app_module, "notify") as note:
+                self.assertEqual(app_module.main(["--favorite", bad], {}), 2)
+                note.assert_called_once()
+
+    def test_main_favorite_uses_context_pane_and_notifies_on_empty_slot(self):
+        from unittest import mock
+
+        from herdr_layouts import app as app_module
+
+        env = {"HERDR_ENV": "1", "HERDR_PLUGIN_CONFIG_DIR": self.temp.name,
+               "HERDR_PLUGIN_CONTEXT_JSON": '{"focused_pane_id": "w1:p9"}'}
+        seen = {}
+
+        def fake_apply(slot, app):
+            seen["pane"], seen["slot"] = app.active_pane_id, slot
+            return False, "No favorite 5 yet: open the picker and press f on a layout."
+
+        with mock.patch.object(app_module, "apply_favorite", fake_apply), \
+                mock.patch.object(app_module, "notify") as note, \
+                mock.patch.object(app_module, "connect", return_value=None):
+            self.assertEqual(app_module.main(["--favorite", "5"], env), 1)
+        self.assertEqual(seen, {"pane": "w1:p9", "slot": 5})
+        self.assertIn("No favorite 5", note.call_args[0][1])
+
+
+class ManifestTests(unittest.TestCase):
+    def test_favorite_actions_declared(self):
+        import sys
+
+        if sys.version_info < (3, 11):
+            self.skipTest("tomllib needs 3.11")
+        import tomllib
+
+        root = Path(__file__).resolve().parents[1]
+        with open(root / "herdr-plugin.toml", "rb") as handle:
+            actions = {a["id"]: a for a in tomllib.load(handle)["actions"]}
+        for n in range(1, 10):
+            action = actions["favorite-%d" % n]
+            self.assertEqual(action["command"], ["python3", "bin/herdr-layouts", "--favorite", str(n)])
+            self.assertEqual(action["contexts"], ["global"])

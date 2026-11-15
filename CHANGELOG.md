@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0
+
+- Bind favorites to keys: new actions `favorite-1` to `favorite-9` apply the Nth favorite directly, with the same transactional apply as the picker (rolled back on failure). Slot order is the picker's Favorites order. Empty slots, layouts that do not fit the tab, interrupted changes and failures show a Herdr notification and exit non-zero.
+
 ## 0.4.2
 
 - Naming: the product is spelled Herdr everywhere (never HerdR); the manifest name is now "Herdr Layouts". Vendored helpers: HerdR → Herdr spelling only.

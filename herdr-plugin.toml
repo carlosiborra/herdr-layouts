@@ -1,6 +1,6 @@
 id = "carlosiborra.layouts"
 name = "Herdr Layouts"
-version = "0.4.2"
+version = "0.5.0"
 min_herdr_version = "0.9.5"
 description = "Visual, recoverable pane layouts with favorites and saved layouts for Herdr"
 platforms = ["linux", "macos"]
@@ -10,6 +10,60 @@ id = "open"
 title = "Choose pane layout"
 contexts = ["global"]
 command = ["python3", "bin/herdr-layouts", "--open"]
+
+[[actions]]
+id = "favorite-1"
+title = "Apply favorite 1"
+contexts = ["global"]
+command = ["python3", "bin/herdr-layouts", "--favorite", "1"]
+
+[[actions]]
+id = "favorite-2"
+title = "Apply favorite 2"
+contexts = ["global"]
+command = ["python3", "bin/herdr-layouts", "--favorite", "2"]
+
+[[actions]]
+id = "favorite-3"
+title = "Apply favorite 3"
+contexts = ["global"]
+command = ["python3", "bin/herdr-layouts", "--favorite", "3"]
+
+[[actions]]
+id = "favorite-4"
+title = "Apply favorite 4"
+contexts = ["global"]
+command = ["python3", "bin/herdr-layouts", "--favorite", "4"]
+
+[[actions]]
+id = "favorite-5"
+title = "Apply favorite 5"
+contexts = ["global"]
+command = ["python3", "bin/herdr-layouts", "--favorite", "5"]
+
+[[actions]]
+id = "favorite-6"
+title = "Apply favorite 6"
+contexts = ["global"]
+command = ["python3", "bin/herdr-layouts", "--favorite", "6"]
+
+[[actions]]
+id = "favorite-7"
+title = "Apply favorite 7"
+contexts = ["global"]
+command = ["python3", "bin/herdr-layouts", "--favorite", "7"]
+
+[[actions]]
+id = "favorite-8"
+title = "Apply favorite 8"
+contexts = ["global"]
+command = ["python3", "bin/herdr-layouts", "--favorite", "8"]
+
+[[actions]]
+id = "favorite-9"
+title = "Apply favorite 9"
+contexts = ["global"]
+command = ["python3", "bin/herdr-layouts", "--favorite", "9"]
 
 [[panes]]
 id = "picker"

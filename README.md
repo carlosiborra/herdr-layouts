@@ -118,6 +118,34 @@ Create `layouts.json` in the same directory. Each layout is a name and a split t
 - Use indexes 0 to n-1 exactly once, for two to four panes.
 - Custom layouts appear in their pane-count group. An invalid entry is skipped and the reason is shown in the picker; the others still load.
 
+## Bind favorites to keys
+
+Each of the first nine favorites has its own action, so one key applies it without opening the picker:
+
+```toml
+[[keys.command]]
+key = "prefix+alt+1"
+type = "plugin_action"
+command = "carlosiborra.layouts.favorite-1"
+
+[[keys.command]]
+key = "prefix+alt+2"
+type = "plugin_action"
+command = "carlosiborra.layouts.favorite-2"
+
+[[keys.command]]
+key = "prefix+alt+3"
+type = "plugin_action"
+command = "carlosiborra.layouts.favorite-3"
+
+[[keys.command]]
+key = "prefix+alt+4"
+type = "plugin_action"
+command = "carlosiborra.layouts.favorite-4"
+```
+
+Slot N is the Nth entry of the picker's Favorites group, the same layout its `N` key applies. Favorites are ordered by when you starred them, so to reorder, press `f` to un-favorite a layout and `f` again to re-favorite it; it moves to the end. The action applies exactly like the picker (same checks, rolled back on failure). An empty slot, a layout that does not fit the tab, or a failure shows a Herdr notification and exits non-zero.
+
 ## Auto layouts and patterns
 
 Press `a` on a layout to make it the auto layout for that pane count. If the layout belongs to a pattern (Columns, Rows, Main Left, Main Right, Main Top, Main Bottom, Grid, Focus Grid), the pattern is adopted too, so every other pane count without its own choice follows it: pick Main Left once and 3, 4, 5 and 6 panes all become Main Left. Counts a pattern cannot fill borrow the closest relative (Main Left with two panes is Columns). Auto layouts show a teal `⟳`.
