@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.9", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -t .
+      - name: Validate manifest
+        if: matrix.python-version == '3.13'
+        run: |
+          python3 - <<'PY'
+          import tomllib
+          with open("herdr-plugin.toml", "rb") as f:
+              m = tomllib.load(f)
+          for key in ("id", "name", "version", "min_herdr_version"):
+              assert m.get(key), "missing " + key
+          for section in ("actions", "panes"):
+              ids = [e["id"] for e in m.get(section, [])]
+              assert ids, "no " + section
+              assert len(ids) == len(set(ids)), "duplicate " + section + " id"
+          print("manifest ok")
+          PY

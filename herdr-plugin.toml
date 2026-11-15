@@ -1,0 +1,20 @@
+id = "herdr-layouts"
+name = "HerdR Layouts"
+version = "0.4.0"
+min_herdr_version = "0.9.5"
+description = "Visual, recoverable pane layouts with favorites and saved layouts for HerdR"
+platforms = ["linux", "macos"]
+
+[[actions]]
+id = "open"
+title = "Choose pane layout"
+contexts = ["global"]
+command = ["python3", "bin/herdr-layouts", "--open"]
+
+[[panes]]
+id = "picker"
+title = "Pane Layouts"
+command = ["python3", "bin/herdr-layouts"]
+placement = "popup"
+width = "72%"
+height = "80%"

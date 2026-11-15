@@ -1,0 +1,1 @@
+{"result":{"layout":{"workspace_id":"w1","tab_id":"w1:t1","focused_pane_id":"w1:p1","zoomed":false,"area":{"x":0,"y":0,"width":120,"height":60},"panes":[{"pane_id":"w1:p1","rect":{"x":0,"y":0,"width":120,"height":30}},{"pane_id":"w1:p2","rect":{"x":0,"y":30,"width":120,"height":30}}],"splits":[{"direction":"down","ratio":0.5,"rect":{"x":0,"y":0,"width":120,"height":60}}]}}}

@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "herdr-layouts"
+version = "0.4.0"
+description = "Visual, recoverable pane layouts with favorites and saved layouts for HerdR"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
