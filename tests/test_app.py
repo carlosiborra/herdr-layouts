@@ -291,3 +291,18 @@ class OpenArgvTests(unittest.TestCase):
         from herdr_layouts.app import _herdr_config_path
         self.assertEqual(_herdr_config_path({"XDG_CONFIG_HOME": "/x"}), Path("/x/herdr/config.toml"))
         self.assertEqual(_herdr_config_path({"HERDR_CONFIG_PATH": "/c.toml", "XDG_CONFIG_HOME": "/x"}), Path("/c.toml"))
+
+
+class ContextPaneTests(unittest.TestCase):
+    def test_popup_pane_id_comes_from_plugin_context(self):
+        from herdr_layouts.app import _context_pane_id
+
+        env = {"HERDR_PLUGIN_CONTEXT_JSON": '{"focused_pane_id": "w1:p2"}'}
+        self.assertEqual(_context_pane_id(env), "w1:p2")
+
+    def test_missing_or_malformed_context_gives_no_pane(self):
+        from herdr_layouts.app import _context_pane_id
+
+        for env in ({}, {"HERDR_PLUGIN_CONTEXT_JSON": "{"}, {"HERDR_PLUGIN_CONTEXT_JSON": "[]"},
+                    {"HERDR_PLUGIN_CONTEXT_JSON": '{"focused_pane_id": 3}'}):
+            self.assertIsNone(_context_pane_id(env))

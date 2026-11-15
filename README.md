@@ -1,8 +1,15 @@
 # HerdR Layouts
 
+[![CI](https://github.com/carlosiborra/herdr-layouts/actions/workflows/ci.yml/badge.svg)](https://github.com/carlosiborra/herdr-layouts/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/carlosiborra/herdr-layouts)](https://github.com/carlosiborra/herdr-layouts/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![HerdR plugin](https://img.shields.io/badge/HerdR-plugin-8A63D2)](https://herdr.dev/tui/plugins/)
+
 Visual, recoverable pane layouts for [HerdR](https://herdr.dev), the terminal workspace manager.
 
 Pick a layout from a picker, press a key, and your panes rearrange without restarting anything.
+
+![Demo: opening the layout picker and applying a layout](docs/demo.gif)
 
 ```text
   Layouts                                                             2 panes   3 panes   4 panes

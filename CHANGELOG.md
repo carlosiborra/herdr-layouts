@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1
+
+- Fixed the picker popup exiting immediately: popup panes receive the focused pane only in `HERDR_PLUGIN_CONTEXT_JSON`, which is now used when `HERDR_ACTIVE_PANE_ID` and `HERDR_PANE_ID` are absent.
+- Added an animated demo to the README, status badges, and GitHub issue templates.
+- Added a drift guard test (`tests/test_vendored.py`) that pins the vendored `theme.py` and `terminal.py` helpers by hash.
+
 ## 0.4.0
 
 - Plugin id is now `carlosiborra.layouts` (namespaced, so it cannot clash with other `herdr-layouts` plugins). Bind actions as `carlosiborra.layouts.<action>`.

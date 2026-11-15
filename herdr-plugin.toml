@@ -1,6 +1,6 @@
 id = "carlosiborra.layouts"
 name = "HerdR Layouts"
-version = "0.4.0"
+version = "0.4.1"
 min_herdr_version = "0.9.5"
 description = "Visual, recoverable pane layouts with favorites and saved layouts for HerdR"
 platforms = ["linux", "macos"]

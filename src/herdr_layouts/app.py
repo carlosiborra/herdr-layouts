@@ -707,6 +707,15 @@ class Headless:
         return "moves"
 
 
+def _context_pane_id(env: Mapping[str, str]) -> Optional[str]:
+    """Popup panes receive the focused pane only in HERDR_PLUGIN_CONTEXT_JSON."""
+    try:
+        value = json.loads(env.get("HERDR_PLUGIN_CONTEXT_JSON") or "{}").get("focused_pane_id")
+    except (ValueError, AttributeError):
+        return None
+    return value if isinstance(value, str) and value else None
+
+
 def main(argv=None, environ: Optional[Mapping[str, str]] = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     env = dict(os.environ if environ is None else environ)
@@ -726,7 +735,7 @@ def main(argv=None, environ: Optional[Mapping[str, str]] = None) -> int:
     if env.get("HERDR_ENV") != "1":
         print("HerdR Layouts must run inside a HerdR pane", file=sys.stderr)
         return 2
-    active_pane_id = env.get("HERDR_ACTIVE_PANE_ID") or env.get("HERDR_PANE_ID")
+    active_pane_id = env.get("HERDR_ACTIVE_PANE_ID") or env.get("HERDR_PANE_ID") or _context_pane_id(env)
     if not active_pane_id:
         print("HerdR did not provide an active pane ID", file=sys.stderr)
         return 2
