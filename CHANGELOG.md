@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- CI: run the Linux jobs on `ubuntu-24.04`. `ubuntu-latest` moved to Ubuntu 26, where Python 3.9 (still supported by this plugin) is not available.
+
 ## 0.5.0
 
 - Bind favorites to keys: new actions `favorite-1` to `favorite-9` apply the Nth favorite directly, with the same transactional apply as the picker (rolled back on failure). Slot order is the picker's Favorites order. Empty slots, layouts that do not fit the tab, interrupted changes and failures show a Herdr notification and exit non-zero.
